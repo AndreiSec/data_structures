@@ -881,6 +881,7 @@ class List:
         self._rear = None
         return target1, target2
 
+
     def split_alt_r(self):
         """
         -------------------------------------------------------
@@ -895,50 +896,128 @@ class List:
                 The List is empty.
         -------------------------------------------------------
         """
-        
         target1 = List()
         target2 = List()
-        
-        
-        target1, target2 = self.split_alt_r_aux(target1, target2, self._front)
-        self._count = 0
+        left = True
+        if self._count > 1:
+            target1, target2, left = self.split_alt_r_aux(target1, target2, left)
+        elif self._count == 1:
+            target1._front = self._front
+            target1._rear = self._front
+            target1._count += 1
+            
         self._front = None
         self._rear = None
-        return target1, target2
-    
-    
-    def split_alt_r_aux(self, target1, target2, current = None, oe = 0):
+        self._count = 0
         
-        ## oe is whether its odd or even
-        if current is not None:
-            if oe == 0:
-                if target1._count == 0:
-                        target1._front = current
-                        target1._rear = current
-                        target1._count += 1
-                else:
-            
-                        target1._rear._next = current
-                        target1._rear = current
-                        target1._count += 1
-                target1, target2 = self.split_alt_r_aux(target1, target2, current._next, 1)
-            elif oe == 1:
-                if target2._count == 0:
-                        target2._front = current
-                        target2._rear = current
-                        target2._count += 1
-                else:
-            
-                        target2._rear._next = current
-                        target2._rear = current
-                        target2._count += 1
-                target1, target2 = self.split_alt_r_aux(target1, target2, current._next, 0)
-        else:
-            if target1._count > 1:
-                target1._rear._next = None
-            if target2._count > 1:
-                target2._rear._next = None
         return target1, target2
+
+
+
+    def split_alt_r_aux(self, target1, target2, left):
+
+        if self._front is not None:
+            
+            if left:
+#                 print("Left " + str(self._front._value))
+                target1._move_front_to_rear(self)
+            else:
+#                 print("Right " + str(self._front._value))
+                target2._move_front_to_rear(self)
+
+            target1, target2, left = self.split_alt_r_aux(target1, target2, not left)
+
+        return target1, target2, left
+    
+    
+    def _move_front_to_rear(self, source):
+        
+        
+        temp = source._front._next
+        source._front._next = None
+        
+        if self._rear is not None:
+            self._rear._next = source._front
+            self._rear = source._front
+        else:
+            self._rear = source._front
+        
+        if self._front is None:
+            self._front = self._rear
+            self._front._next = self._rear
+        
+        source._front = temp
+        
+        
+#         if source._front is not None:
+#             print("Source front after: " + str(source._front._value))
+#         if self._rear is not None:
+#             print("Target rear after: " + str(self._rear._value))
+        
+#         print()
+        source._count -= 1
+        self._count += 1
+        return
+    
+    
+#     def split_alt_r(self):
+#         """
+#         -------------------------------------------------------
+#         Split a list into two parts. even contains the even indexed
+#         elements, odd contains the odd indexed elements.
+#         Order of even and odd is not significant. (recursive version)
+#         Use: even, odd = lst.split_alt()
+#         -------------------------------------------------------
+#         Returns:
+#             even - the even numbered elements of the list (List)
+#             odd - the odd numbered elements of the list (List)
+#                 The List is empty.
+#         -------------------------------------------------------
+#         """
+#         
+#         target1 = List()
+#         target2 = List()
+#         
+#         
+#         target1, target2 = self.split_alt_r_aux(target1, target2, self._front)
+#         self._count = 0
+#         self._front = None
+#         self._rear = None
+#         return target1, target2
+#     
+#     
+#     def split_alt_r_aux(self, target1, target2, current = None, oe = 0):
+#         
+#         ## oe is whether its odd or even
+#         if current is not None:
+#             if oe == 0:
+#                 if target1._count == 0:
+#                         target1._front = current
+#                         target1._rear = current
+#                         target1._count += 1
+#                 else:
+#             
+#                         target1._rear._next = current
+#                         target1._rear = current
+#                         target1._count += 1
+#                 target1, target2 = self.split_alt_r_aux(target1, target2, current._next, 1)
+#             elif oe == 1:
+#                 if target2._count == 0:
+#                         target2._front = current
+#                         target2._rear = current
+#                         target2._count += 1
+#                 else:
+#             
+#                         target2._rear._next = current
+#                         target2._rear = current
+#                         target2._count += 1
+#                 target1, target2 = self.split_alt_r_aux(target1, target2, current._next, 0)
+#         else:
+#             if target1._count > 1:
+#                 target1._rear._next = None
+#             if target2._count > 1:
+#                 target2._rear._next = None
+#         return target1, target2
     
     
     def _linear_search_r_aux(self, previous, current, index, key):
@@ -1107,7 +1186,7 @@ class List:
         
         
         return
-
+    
     def union_r(self, source1, source2):
         """
         -------------------------------------------------------
@@ -1123,21 +1202,56 @@ class List:
             None
         -------------------------------------------------------
         """
-        current1 = None
-        current2 = None
-        if source1 is not None and source1._count > 0:
-            current1 = source1._front
-        if source2 is not None and source2._count > 0:
-            current2 = source2._front
-        
-        
-        
-        self = self.union_r_aux(current1)
-        self = self.union_r_aux(current2)
-        
-        
-        
+        source1_node = source1._front
+        source2_node = source2._front
+
+        self.union_r_aux(source1_node)
+        self.union_r_aux(source2_node)
+
         return
+
+
+    def union_r_aux(self,source_node):
+        if source_node is not None:
+            value = source_node._value
+            previous, current, i = self._linear_search_r(value)
+
+            if i == -1:
+                # Value does not exist in new list.
+                self.append(value)
+
+            self.union_r_aux(source_node._next)
+        return
+#     def union_r(self, source1, source2):
+#         """
+#         -------------------------------------------------------
+#         Update the current list with all values that appear in
+#         source1 and source2. Values do not repeat.
+#         (recursive algorithm)
+#         Use: target.union(source1, source2)
+#         -------------------------------------------------------
+#         Parameters:
+#             source1 - a linked list (List)
+#             source2 - a linked list (List)
+#         Returns:
+#             None
+#         -------------------------------------------------------
+#         """
+#         current1 = None
+#         current2 = None
+#         if source1 is not None and source1._count > 0:
+#             current1 = source1._front
+#         if source2 is not None and source2._count > 0:
+#             current2 = source2._front
+#         
+#         
+#         
+#         self = self.union_r_aux(current1)
+#         self = self.union_r_aux(current2)
+#         
+#         
+#         
+#         return
 
 
 #     def union_r_aux(self, current):

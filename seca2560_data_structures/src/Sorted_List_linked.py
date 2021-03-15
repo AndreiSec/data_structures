@@ -320,12 +320,12 @@ class Sorted_List:
         -------------------------------------------------------
         """
         assert self._is_valid_index(i), "Invalid index value"
-        i += 0
         current = self._front
         index = 0
         if i < 0:
             i = self._count + i
-        while index != i:
+        while index < i:
+            print("F")
             current = current._next
             index += 1
         if i == index:
